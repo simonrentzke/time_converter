@@ -1,0 +1,40 @@
+---
+title: Time Converter
+---
+
+<div class="welcome">
+  <h1>Convert Your Time</h1>
+  <p class="doc">
+    <%= text_field_tag :input_time, :id => 'input_time', :placeholder => "Eg. 2013-08-28 23:21 GMT-0400" %>
+    <%= submit_tag 'Convert', :id => 'convert' %>
+  </p>
+  <p id='time_utc'></p>
+  <p id='time_local'></p>
+</div>
+
+<script type="text/javascript">
+	$('#input_time').keydown(function(e) {
+		convertTime();
+	})
+	
+	$('#convert').click(function(e) {
+		convertTime();
+	})
+
+	function convertTime() {
+		var time = $('#input_time').val();
+		if (time == 'now' || time == 'now()') {
+		 	var parsed = moment()
+		 	$('#time_local').html(parsed._d);
+		 	$('#time_utc').html();
+		} else {
+			var parsed = moment(time);
+			if (parsed && parsed.isValid()) {
+				console.log(parsed)
+				$('#time_local').html('That is <strong>' + parsed.format() + '</strong> locally for you.');
+				$('#time_utc').html('That is <strong>' + parsed.utc().format() + '</strong> in UTC.');
+			}
+		}
+	
+	}
+</script>
