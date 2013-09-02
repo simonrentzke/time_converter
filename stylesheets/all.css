@@ -1,0 +1,10 @@
+body {
+  font-family: courier;
+  text-align: center;
+  letter-spacing: 0.0625em;
+  font-size: 2em;
+}
+
+input#input_time {
+  width: 500px;
+}
