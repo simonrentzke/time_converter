@@ -5,14 +5,16 @@
     
     <!-- Always force latest IE rendering engine or request Chrome Frame -->
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
-    
-    <!-- Use title if it's in the page YAML frontmatter -->
     <title>Time Converter</title>
     
     <link href="/stylesheets/normalize.css" media="screen" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/all.css" media="screen" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.2.1/pure-min.css">
+    <link rel="stylesheet" href="javascripts/chosen/chosen.css">
     <script src="/javascripts/all.js" type="text/javascript"></script>
+<script src="/javascripts/moment.min.js" type="text/javascript"></script>
+<script src="/javascripts/moment-timezone.min.js" type="text/javascript"></script>
+<script src="/javascripts/moment-data.js" type="text/javascript"></script>
   </head>
   
   <body class="index">
@@ -22,14 +24,18 @@
         <div class="welcome">
   <h1>Convert Your Time</h1>
   <p class="doc">
-    <input id="input_time" placeholder="Eg. 2013-08-28 23:21 GMT-0400" name="input_time" type="text" />
+    Enter time <input id="input_time" name="input_time" type="text" />
     <input id="convert" value="Convert" type="submit" />
+  </p>
+  <p>Or <select id="input_timezone" name="timezone"></select>
   </p>
   <p id='time_utc'></p>
   <p id='time_local'></p>
+  <p id='time_zone'></p>
 </div>
 
 <script type="text/javascript">
+	var ft = 'YYYY-MM-DD H:mm:ss Z'
 	$('#input_time').keydown(function(e) {
 		convertTime();
 	})
@@ -37,22 +43,29 @@
 	$('#convert').click(function(e) {
 		convertTime();
 	})
+ 	var keys = Object.keys(momentTzData.zones)
+	var options = keys.map(function(zone) {
+		return '<option value="' + zone + '"">' + zone + '</option>'
+	})
+
+	$('#input_timezone').html('<option value="">Choose timezone...</option>' + options.join())
+	$('#input_time').val(moment().format(ft))
+
+	$('#input_timezone').change(function() {convertTime()})
+	$('#input_timezone').chosen();
 
 	function convertTime() {
 		var time = $('#input_time').val();
-		if (time == 'now' || time == 'now()') {
-		 	var parsed = moment()
-		 	$('#time_local').html(parsed._d);
-		 	$('#time_utc').html();
-		} else {
-			var parsed = moment(time);
-			if (parsed && parsed.isValid()) {
-				console.log(parsed)
-				$('#time_local').html('That is <strong>' + parsed.format() + '</strong> locally for you.');
-				$('#time_utc').html('That is <strong>' + parsed.utc().format() + '</strong> in UTC.');
+		var parsed = moment(time);
+		if (parsed && parsed.isValid()) {
+			$('#time_local').html('That is <strong>' + parsed.format(ft) + '</strong> locally for you.');
+			$('#time_utc').html('That is <strong>' + parsed.utc().format(ft) + '</strong> in UTC.');
+			var tzinfo = $('#input_timezone').val()
+			console.log(tzinfo);
+			if (tzinfo != '') {
+				$('#time_zone').html('That is <strong>' + parsed.tz(tzinfo).format(ft) + '</strong> in ' + tzinfo + '.');
 			}
-		}
-	
+		}	
 	}
 </script>
       <!-- </div> -->
