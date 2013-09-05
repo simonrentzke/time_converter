@@ -5,14 +5,18 @@ title: Time Converter
 <div class="welcome">
   <h1>Convert Your Time</h1>
   <p class="doc">
-    <%= text_field_tag :input_time, :id => 'input_time', :placeholder => "Eg. 2013-08-28 23:21 GMT-0400" %>
+    Enter time <%= text_field_tag :input_time, :id => 'input_time'  %>
     <%= submit_tag 'Convert', :id => 'convert' %>
+  </p>
+  <p>Or <%= select_tag :timezone, :id => 'input_timezone' %>
   </p>
   <p id='time_utc'></p>
   <p id='time_local'></p>
+  <p id='time_zone'></p>
 </div>
 
 <script type="text/javascript">
+	var ft = 'YYYY-MM-DD H:mm:ss Z'
 	$('#input_time').keydown(function(e) {
 		convertTime();
 	})
@@ -20,21 +24,28 @@ title: Time Converter
 	$('#convert').click(function(e) {
 		convertTime();
 	})
+ 	var keys = Object.keys(momentTzData.zones)
+	var options = keys.map(function(zone) {
+		return '<option value="' + zone + '"">' + zone + '</option>'
+	})
+
+	$('#input_timezone').html('<option value="">Choose timezone...</option>' + options.join())
+	$('#input_time').val(moment().format(ft))
+
+	$('#input_timezone').change(function() {convertTime()})
+	$('#input_timezone').chosen();
 
 	function convertTime() {
 		var time = $('#input_time').val();
-		if (time == 'now' || time == 'now()') {
-		 	var parsed = moment()
-		 	$('#time_local').html(parsed._d);
-		 	$('#time_utc').html();
-		} else {
-			var parsed = moment(time);
-			if (parsed && parsed.isValid()) {
-				console.log(parsed)
-				$('#time_local').html('That is <strong>' + parsed.format() + '</strong> locally for you.');
-				$('#time_utc').html('That is <strong>' + parsed.utc().format() + '</strong> in UTC.');
+		var parsed = moment(time);
+		if (parsed && parsed.isValid()) {
+			$('#time_local').html('That is <strong>' + parsed.format(ft) + '</strong> locally for you.');
+			$('#time_utc').html('That is <strong>' + parsed.utc().format(ft) + '</strong> in UTC.');
+			var tzinfo = $('#input_timezone').val()
+			console.log(tzinfo);
+			if (tzinfo != '') {
+				$('#time_zone').html('That is <strong>' + parsed.tz(tzinfo).format(ft) + '</strong> in ' + tzinfo + '.');
 			}
-		}
-	
+		}	
 	}
 </script>
