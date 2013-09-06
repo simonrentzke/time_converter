@@ -3,16 +3,23 @@ title: Time Converter
 ---
 
 <div class="welcome">
-  <h1>Convert Your Time</h1>
+  <h1 class="page-title">Convert Your Time</h1>
   <p class="doc">
-    Enter time <%= text_field_tag :input_time, :id => 'input_time'  %>
-    <%= submit_tag 'Convert', :id => 'convert' %>
+  	<label for="input_time">Enter time</label>
+    <%= text_field_tag :input_time, :id => 'input_time', :class => 'time-input'  %>
+    <button type="submit" value="Convert" id="convert">Convert</button>
+    <%# submit_tag 'Convert', :id => 'convert' %>
   </p>
-  <p>Or <%= select_tag :timezone, :id => 'input_timezone' %>
+  <p class="or-select">Or <%= select_tag :timezone, :id => 'input_timezone', :class => 'input-timezone' %>
   </p>
-  <p id='time_utc'></p>
-  <p id='time_local'></p>
-  <p id='time_zone'></p>
+  <div class="answers">
+  	<p class="hidden" id="that_is">That is</p>
+  	<ul>
+  		<li id='time_utc'></li>
+  		<li id='time_local'></li>
+  		<li id='time_zone'></li>
+  	</ul>
+  </div>
 </div>
 
 <script type="text/javascript">
@@ -39,13 +46,16 @@ title: Time Converter
 		var time = $('#input_time').val();
 		var parsed = moment(time);
 		if (parsed && parsed.isValid()) {
-			$('#time_local').html('That is <strong>' + parsed.format(ft) + '</strong> locally for you.');
-			$('#time_utc').html('That is <strong>' + parsed.utc().format(ft) + '</strong> in UTC.');
+			$('#that_is').removeClass('hidden');
+			$('#time_local').html('<strong>' + parsed.format(ft) + '</strong> locally for you.');
+			$('#time_utc').html('<strong>' + parsed.utc().format(ft) + '</strong> in UTC.');
 			var tzinfo = $('#input_timezone').val()
 			console.log(tzinfo);
 			if (tzinfo != '') {
-				$('#time_zone').html('That is <strong>' + parsed.tz(tzinfo).format(ft) + '</strong> in ' + tzinfo + '.');
+				$('#time_zone').html('<strong>' + parsed.tz(tzinfo).format(ft) + '</strong> in ' + tzinfo + '.');
 			}
-		}	
+		} else {
+			$('#that_is').addClass('hidden');
+		}
 	}
 </script>
